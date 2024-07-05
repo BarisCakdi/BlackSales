@@ -1,0 +1,33 @@
+﻿@model BlackSales.Models.ProductCategoryViewModel
+
+
+<div class="col-lg-6">
+    <h3>Yeni İlan Ekle</h3>
+    <form class="row g-3 mb-3" method="post" action="/admin/add" enctype="multipart/form-data">
+        <div class="col-12">
+            <select class="form-select" aria-label="Default select example" name="CategoryId">
+                <option selected disabled>Kategori</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.id">@category.Name</option>
+                }
+
+            </select>
+        </div>
+        <div class="col-12">
+            <input type="text" class="form-control" name="Name" placeholder="Ürün Adı">
+        </div>
+        <div class="col-12">
+            <input type="email" class="form-control" name="Mail" placeholder="Mail Adresi">
+        </div>
+        <div class="col-12">
+            <input type="number" class="form-control" name="Price" placeholder="Fiyat">
+        </div>
+        <div class="col-12">
+            <input type="file" class="form-control" name="Img" placeholder="Url formatı">
+        </div>
+        <div class="col-12">
+            <button class="btn btn-success btn-block">Ekle</button>
+        </div>
+    </form>
+ </div>

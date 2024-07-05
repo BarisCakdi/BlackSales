@@ -1,0 +1,130 @@
+﻿@model BlackSales.Models.ProductCategoryViewModel
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="container px-4">
+    <div class="row">
+        <div class="col-lg-6">
+            <h3>Yeni Kategori Ekle</h3>
+            <form class="row g-3 mb-3" method="post" action="/admin/addcategry" enctype="multipart/form-data">
+                <div class="col-12">
+                    <input type="text" class="form-control" name="Name" placeholder="Kategori Adı">
+                </div>
+                <div class="col-12">
+                    <input type="file" class="form-control" name="Img" placeholder="Url formatı">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-success btn-block">Ekle</button>
+                </div>
+            </form>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Kategori Görseli</th>
+                        <th>Kategori Adı</th>
+                        <th>Düzenle</th>
+                        <th>Sil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <tr>
+                            <form method="post" action="/admin/EditCategry/@category.id" enctype="multipart/form-data" class="d-inline-block">
+                            <td><img src="/uploads/@category.ImagePath" alt="Görsel" class="img-thumbnail" style="max-width: 100px;"></td>
+                            <td>
+                                <input type="text" class="form-control mb-2" name="Name" value="@category.Name" placeholder="Kategori Adı">
+                                <input type="file" class="form-control mb-2" name="Img" value="@category.Img" placeholder="Görsel">
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-warning">Düzenle</button>
+                            </td>
+                            </form>
+                            <td>
+
+                                <form method="post" action="/admin/DelCategry" class="d-inline-block ml-2">
+                                    <input type="hidden" name="id" value="@category.id">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Bu kategorideki bütün ürünler silinecektir!!!  Emin misin?')">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-lg-6">
+            <h3>Yeni İlan Ekle</h3>
+            <form class="row g-3 mb-3" method="post" action="/admin/add" enctype="multipart/form-data">
+                <div class="col-12">
+                    <select class="form-select" aria-label="Default select example" name="CategoryId">
+                        <option selected disabled>Kategori</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.id">@category.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12">
+                    <input type="text" class="form-control" name="Name" placeholder="Ürün Adı">
+                </div>
+                <div class="col-12">
+                    <input type="number" class="form-control" name="Price" placeholder="Fiyat">
+                </div>
+                <div class="col-12">
+                    <input type="file" class="form-control" name="Img" placeholder="Url formatı">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-success btn-block">Ekle</button>
+                </div>
+            </form>
+
+            <table class="table table-striped mt-4">
+                <thead>
+                    <tr>
+                        <th>İlan</th>
+                        <th>Düzenle</th>
+                        <th>Sil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var posts in Model.Products)
+                    {
+                        <tr>
+                            <form method="post" action="/admin/edit/@posts.Id" class="d-inline-block">
+                            <td>
+                                <select class="form-select" aria-label="Default select example" name="CategoryId">
+                                    <!-- İlk olarak seçili kategoriyi göster -->
+                                        @foreach (var category in Model.Categories.Where(c => c.id == posts.CategoryId))
+                                        {
+                                        <option value="@category.id" selected>@category.Name</option>
+                                        }
+                                    <!-- Ardından diğer kategorileri göster -->
+                                        @foreach (var category in Model.Categories.Where(c => c.id != posts.CategoryId))
+                                        {
+                                        <option value="@category.id">@category.Name</option>
+                                        }
+                                </select>
+                                <input type="text" class="form-control mb-2" name="Name" value="@posts.Name" placeholder="Ürün Adı">
+                                <input type="text" class="form-control mb-2" name="Price" value="@posts.Price" placeholder="Ürün Fiyatı">
+                                <input type="file" class="form-control mb-2" name="Img" value="@posts.Img" placeholder="Görsel">
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-warning">Düzenle</button>
+                            </td>
+                            </form>
+                            <td>
+                                <form method="post" action="/admin/delete" class="d-inline-block ml-2">
+                                    <input type="hidden" name="id" value="@posts.Id">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Emin misin?')">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

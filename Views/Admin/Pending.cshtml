@@ -1,0 +1,65 @@
+﻿@model List<Product>
+@{
+    Layout = "_AdminLayout";
+}
+<h4>Gelen Gönderiler</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Gönderi Başlık</th>
+            <th scope="col">Ekleme Tarihi</th>
+            <th scope="col">Ürün Görsel</th>
+            <th scope="col">Ürün Fiyat</th>
+            <th scope="col">İşlem</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var post in Model)
+        {
+            if (!post.IsApproved)
+            {
+                <tr>
+                    <td>@post.Name</td>
+                    <td>@post.CreatedDate.ToString()</td>
+                    <td><img src="/uploads/@post.ImagePath" alt="@post.Name" /></td>
+                    <td>@post.Price.ToString("N")</td>
+                    <td>
+                        <a href="/admin/PostApproval/@post.Id" class="btn btn-primary">Onayla</a>
+                        <a href="/admin/delete/@post.Id" onclick="return confirm('Emin misin?')" class="btn btn-danger">Sil</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<h4>Onaylanan Gönderiler</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Gönderi Başlık</th>
+            <th scope="col">Ekleme Tarihi</th>
+            <th scope="col">Ürün Görsel</th>
+            <th scope="col">Ürün Fiyat</th>
+            <th scope="col">İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var post in Model)
+        {
+            if (post.IsApproved)
+            {
+                <tr>
+                    <td>@post.Name</td>
+                    <td>@post.CreatedDate.ToString()</td>
+                    <td><img src="/uploads/@post.ImagePath" alt="@post.Name" /></td>
+                    <td>@post.Price.ToString("N")</td>
+                    <td>
+                        <a href="/admin/delete/@post.Id" onclick="return confirm('Emin misin?')" class="btn btn-danger">Sil</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
