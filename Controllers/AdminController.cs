@@ -16,6 +16,7 @@ namespace BlackSales.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Title"] = "Admin";
             using var connection = new SqlConnection(connectionString);
             var products = connection.Query<Product>("SELECT * FROM posts").ToList();
             var categories = connection.Query<Category>("SELECT * FROM categry").ToList();
@@ -31,7 +32,7 @@ namespace BlackSales.Controllers
         [HttpPost]
         public IActionResult Add(Product model)
         {
-            ViewData["Title"] = "Kayıt Ekle";
+            
 
             if (!ModelState.IsValid)
             {
@@ -53,7 +54,7 @@ namespace BlackSales.Controllers
             model.CreatedDate = DateTime.Now;
             model.UpdatedDate = DateTime.Now;
             using var connection = new SqlConnection(connectionString);
-            var sql = "INSERT INTO posts (Name, Price, CreatedDate, UpdatedDate, CategoryId, ImagePath) VALUES (@Name, @Price, @CreatedDate, @UpdatedDate, @CategoryId, @ImagePath)";
+            var sql = "INSERT INTO posts (Name, Price, CreatedDate, UpdatedDate, CategoryId, ImagePath, Mail) VALUES (@Name, @Price, @CreatedDate, @UpdatedDate, @CategoryId, @ImagePath, @Mail)";
             var data = new
             {
                 model.Name,
@@ -62,6 +63,7 @@ namespace BlackSales.Controllers
                 model.UpdatedDate,
                 model.CategoryId,
                 model.ImagePath,
+                model.Mail,
             };
 
             var rowsAffected = connection.Execute(sql, data);
@@ -130,14 +132,14 @@ namespace BlackSales.Controllers
         {
 
             using var connection = new SqlConnection(connectionString);
-            var sql = "DELETE from posts WHERE Id = @Id";
+            var sql = "DELETE from posts WHERE Id = " + id;
             var rowsAffected = connection.Execute(sql, new { id });
             return RedirectToAction("index");
 
         }
         public IActionResult Pending()
         {
-
+            ViewData["Title"] = "Admin - Onay";
             using var connection = new SqlConnection(connectionString);
             var posts = connection.Query<Product>("SELECT * FROM posts").ToList();
 
@@ -146,6 +148,7 @@ namespace BlackSales.Controllers
         public IActionResult PostApproval(int? id)
         {
             var PostModel = new ProductCategoryViewModel();
+            string mail = string.Empty;
             // Connect to the database
             using (var connection = new SqlConnection(connectionString))
             {
@@ -155,10 +158,9 @@ namespace BlackSales.Controllers
             }
             using (var connection = new SqlConnection(connectionString))
             {
-                var sql = $"SELECT Mail FROM posts WHERE Id = @Id";
-                string Mail = connection.Query<string>(sql).First();
-                //var posts = connection.Query<Product>(sql).ToList();
-                //PostModel.Products = posts;
+                var sql = $"SELECT Mail FROM posts WHERE Id =" + id;
+                 mail = connection.Query<string>(sql).First();
+                
             }
 
             
@@ -167,13 +169,13 @@ namespace BlackSales.Controllers
             {
                 From = new MailAddress("postmaster@bildirim.bariscakdi.com.tr", "Barış"),
                 Subject = "bariscakdi.com.tr'den mesaj var!!",
-                Body = "İlanınız onaylandıktan sonra yayına alınacaktır.",
+                Body = "İlanınız onaylanmıştır.",
                 IsBodyHtml = true,
             };
             //bu kısımda gönderilen maili yönlendirmek istediğimiz mail adresi
             mailMassage.ReplyToList.Add("bariscakdi@gmail.com");
 
-            mailMassage.To.Add(new MailAddress("Mail", "BlackSales"));
+            mailMassage.To.Add(new MailAddress(mail, "BlackSales"));
 
 
             client.Send(mailMassage);
@@ -182,7 +184,7 @@ namespace BlackSales.Controllers
 
 
             ViewBag.MessageCssClass = "alert-success";
-            ViewBag.Message = "Güncellendi.";
+            ViewBag.Message = "Onaylandı";
             return View("Message");
 
         }
@@ -266,28 +268,5 @@ namespace BlackSales.Controllers
 
         }
 
-        public IActionResult Contact()
-        {
-            
-            var mailMassage = new MailMessage
-            {
-                From = new MailAddress("postmaster@bildirim.bariscakdi.com.tr", "Barış"),
-                Subject = "bariscakdi.com.tr'den mesaj var!!",
-                Body = $@"Kimden: <br>
-                        E-Posta Adresi: <br>
-                        Konu: <br>
-                        Mesaj: ",
-                IsBodyHtml = true,
-            };
-            //bu kısımda gönderilen maili yönlendirmek istediğimiz mail adresi
-            mailMassage.ReplyToList.Add("bariscakdi@gmail.com");
-
-            //mailMassage.To.Add("bariscakdi@gmail.com"); Bu direk olarak gönderme alt taraftaki özel olarak isim belirtme.
-            mailMassage.To.Add(new MailAddress("bariscakdi@gmail.com", "baris"));
-
-            client.Send(mailMassage);
-
-            return View();
-        }
     }
 }

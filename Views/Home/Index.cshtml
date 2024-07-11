@@ -1,34 +1,38 @@
 ﻿@model BlackSales.Models.ProductCategoryViewModel
+@using System.Globalization
 
-
-<form>
-    <div class="container px-4 text-center">
-        <div class="row gx-5">
-            @foreach (var urun in Model.Products)
+<section class="categories">
+    <h2>Kategoriler</h2>
+    <div class="container">
+        <div class="row">
+            @foreach (var category in Model.Categories)
             {
-
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="/uploads/@urun.ImagePath" alt="@urun.Name" class="card-img-top img-fluid">
-                        <div class="card-body mb-2">
-                            <h5 class="card-title">@urun.Name</h5>
-                            <p class="card-text">Fiyat: @urun.Price.ToString("N") TL</p>
-                            <p class="card-text">Oluşturulma Tarihi: @urun.CreatedDate.ToString("dd.MM.yyyy")</p>
-                            <p class="card-text">Güncelleme Tarihi: @urun.UpdatedDate.ToString("dd.MM.yyyy")</p>
-                            @foreach (var cate in Model.Categories)
-                            {
-                                if (cate.id == urun.CategoryId)
-                                {
-                                    <p class="card-text">@cate.Name</p>
-                                }
-                            }
-                            <div class="card-footer mt-2">
-                                <p><button name="Fiyat" class="btn btn-primary">Satın Al</button></p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 col-12 category">
+                    <a href="@Url.Action("Index", "Home", new { categoryId = category.id })">
+                        <p>@category.Name</p>
+                    </a>
                 </div>
             }
         </div>
     </div>
-</form>
+</section>
+
+<div class="container px-4 text-center">
+    <div class="row gx-5">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <img src="/uploads/@product.ImagePath" alt="@product.Name" class="card-img-top img-fluid">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">Fiyat: @product.Price.ToString("c", CultureInfo.CreateSpecificCulture("tr-TR"))</p>
+                        <p class="card-text">Oluşturulma Tarihi: @product.CreatedDate.ToString("dd.MM.yyyy")</p>
+                        <p class="card-text">Güncelleme Tarihi: @product.UpdatedDate.ToString("dd.MM.yyyy")</p>
+                        <p class="card-text">@Model.Categories.FirstOrDefault(c => c.id == product.CategoryId)?.Name</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
