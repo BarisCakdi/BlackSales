@@ -10,8 +10,7 @@ namespace BlackSales.Models
         public string Name { get; set; }
         [Required(ErrorMessage = "Ürün fiyatı zorunludur.")]
         public int Price { get; set; }
-        [Required(ErrorMessage = "Ürün görseli zorunludur.")]
-        public IFormFile Img { get; set; }
+        public IFormFile? Img { get; set; }
         public string? ImagePath { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }

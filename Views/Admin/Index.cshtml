@@ -1,4 +1,5 @@
 ﻿@model BlackSales.Models.ProductCategoryViewModel
+@using System.Globalization
 @{
     Layout = "_AdminLayout";
 }
@@ -96,28 +97,32 @@
                     @foreach (var posts in Model.Products)
                     {
                         <tr>
-                            <form method="post" action="/admin/edit/@posts.Id" class="d-inline-block">
+                            <form method="post" action="/admin/edit/@posts.Id" enctype="multipart/form-data" class="d-inline-block">
                             <td>
                                 <select class="form-select" aria-label="Default select example" name="CategoryId">
-                                    <!-- İlk olarak seçili kategoriyi göster -->
                                         @foreach (var category in Model.Categories.Where(c => c.id == posts.CategoryId))
                                         {
                                         <option value="@category.id" selected>@category.Name</option>
                                         }
-                                    <!-- Ardından diğer kategorileri göster -->
                                         @foreach (var category in Model.Categories.Where(c => c.id != posts.CategoryId))
                                         {
                                         <option value="@category.id">@category.Name</option>
                                         }
                                 </select>
                                 <input type="text" class="form-control mb-2" name="Name" value="@posts.Name" placeholder="Ürün Adı">
-                                <input type="text" class="form-control mb-2" name="Price" value="@posts.Price" placeholder="Ürün Fiyatı">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">₺</span>
+                                    <input type="number" class="form-control" name="Price" value="@posts.Price" placeholder="Ürün Fiyatı" step="0.01">
+                                </div>
                                 <input type="file" class="form-control mb-2" name="Img" value="@posts.Img" placeholder="Görsel">
+                                <input type="email" class="form-control mb-2" name="Mail" value="@posts.Mail" placeholder="E-mail">
+                                <input type="hidden" name="ExistingImagePath" value="@posts.ImagePath">
                             </td>
                             <td>
                                 <button type="submit" class="btn btn-warning">Düzenle</button>
                             </td>
                             </form>
+
                             <td>
                                 <form method="post" action="/admin/delete" class="d-inline-block ml-2">
                                     <input type="hidden" name="id" value="@posts.Id">

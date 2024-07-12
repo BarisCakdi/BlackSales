@@ -91,9 +91,11 @@ namespace BlackSales.Controllers
             return View("Message");
         }
         [HttpPost]
-        public IActionResult Edit(Product model)
+        public IActionResult Edit(Product model, string ExistingImagePath)
         {
             ViewData["Title"] = "Kayıt Düzenle";
+
+            // Model geçerli değilse
             if (!ModelState.IsValid)
             {
                 ViewBag.MessageCssClass = "alert-danger";
@@ -101,6 +103,7 @@ namespace BlackSales.Controllers
                 return View("Message");
             }
 
+            // Eğer resim güncellemek istersek bu kısım kullanılıyor.
             if (model.Img != null && model.Img.Length > 0)
             {
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Img.FileName);
@@ -110,24 +113,48 @@ namespace BlackSales.Controllers
                 model.Img.CopyTo(fileStream);
                 model.ImagePath = fileName;
             }
+            else
+            {
+                // Mevcut resim ile devam ediyorum
+                model.ImagePath = ExistingImagePath;
+            }
+            
 
-            using var connection = new SqlConnection(connectionString);
-            var sql = "UPDATE posts SET CategoryId=@CategoryID, Name=@Name, ImagePath=@ImagePath, Price=@Price, UpdatedDate=@UpdatedDate WHERE Id = @Id";
+            
+
+            using var conn = new SqlConnection(connectionString);
+
+            // Mevcut e-posta adresini veritabanından alıyorum
+            var sqlMail = "SELECT Mail FROM posts WHERE Id = @Id";
+            var existingMail = conn.QuerySingleOrDefault<string>(sqlMail, new { model.Id });
+
+            if (existingMail == null)
+            {
+                ViewBag.MessageCssClass = "alert-danger";
+                ViewBag.Message = "Kayıt bulunamadı.";
+                return View("Message");
+            }
+
+            var sqlUpdate = "UPDATE posts SET CategoryId=@CategoryId, Name=@Name, ImagePath=@ImagePath, Price=@Price, UpdatedDate=@UpdatedDate, Mail=@Mail WHERE Id = @Id";
             var param = new
             {
-                model.Price,
+                model.CategoryId,
                 model.Name,
                 model.ImagePath,
+                model.Price,
                 UpdatedDate = DateTime.Now,
-                model.CategoryId,
+                Mail = existingMail, // Veritabanından alınan mevcut e-posta adresi
                 model.Id
             };
 
-            var affectedRows = connection.Execute(sql, param);
+            var affectedRows = conn.Execute(sqlUpdate, param);
+
             ViewBag.MessageCssClass = "alert-success";
             ViewBag.Message = "Güncellendi.";
             return View("Message");
         }
+
+
         public IActionResult Delete(int id)
         {
 
